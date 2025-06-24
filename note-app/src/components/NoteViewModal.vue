@@ -108,6 +108,7 @@ const emit = defineEmits<{
   close: []
   edit: [note: Note]
   delete: [note: Note]
+  requestDelete: [note: Note]
 }>()
 
 const handleOverlayClick = (event: MouseEvent) => {
@@ -117,29 +118,28 @@ const handleOverlayClick = (event: MouseEvent) => {
 }
 
 const handleDelete = () => {
-  if (confirm(`Are you sure you want to delete "${props.note.title}"?`)) {
-    emit('delete', props.note)
-  }
+  emit('requestDelete', props.note)
 }
 
 const formatDateShort = (dateString: string): string => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
+  // Parse as UTC and convert to local
+  const date = new Date(dateString + 'Z');
+  const now = new Date();
+  const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
   
   if (diffInHours < 1) {
-    return 'just now'
+    return 'just now';
   } else if (diffInHours < 24) {
-    return `${Math.floor(diffInHours)}h ago`
+    return `${Math.floor(diffInHours)}h ago`;
   } else if (diffInHours < 24 * 7) {
-    const days = Math.floor(diffInHours / 24)
-    return `${days}d ago`
+    const days = Math.floor(diffInHours / 24);
+    return `${days}d ago`;
   } else {
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
       day: 'numeric',
       year: 'numeric'
-    })
+    });
   }
 }
 

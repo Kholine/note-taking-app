@@ -56,7 +56,7 @@
       
       <!-- Footer metadata -->
       <div class="flex items-center justify-between text-xs text-gray-500">
-        <span>{{ formatDateShort(note.updatedAt) }}</span>
+        <span>{{ formatDateShort(note.createdAt) }}</span>
         
         <!-- Color indicator -->
         <div :class="[
@@ -97,22 +97,24 @@ const cardColors = [
 ]
 
 const formatDateShort = (dateString: string): string => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
+  // Parse as UTC and convert to local
+  const date = new Date(dateString + 'Z');
+  const now = new Date();
+  const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
   
   if (diffInHours < 1) {
-    return 'Just now'
+    return 'Just now';
   } else if (diffInHours < 24) {
-    return `${Math.floor(diffInHours)}h ago`
+    return `${Math.floor(diffInHours)}h ago`;
   } else if (diffInHours < 24 * 7) {
-    const days = Math.floor(diffInHours / 24)
-    return `${days}d ago`
+    const days = Math.floor(diffInHours / 24);
+    return `${days}d ago`;
   } else {
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
-      day: 'numeric' 
-    })
+      day: 'numeric',
+      year: 'numeric'
+    });
   }
 }
 </script>

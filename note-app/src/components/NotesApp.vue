@@ -64,8 +64,7 @@
       <header class="bg-white border-b border-gray-200 px-8 py-6 flex-shrink-0">
         <div class="flex justify-between items-center">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Notes</h1>
-            <p class="text-gray-600 mt-1">{{ notesStore.sortedAndFilteredNotes.length }} notes</p>
+            <h1 class="text-3xl font-bold text-gray-900">My Notes</h1>
           </div>
           <div class="flex items-center space-x-3">
             <!-- Sort Controls -->
@@ -159,7 +158,22 @@
       :note="viewingNote"
       @close="closeView"
       @edit="editFromView"
-      @delete="deleteFromView"
+      @request-delete="deleteFromView"
+    />
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      v-if="deleteConfirmNote"
+      @cancel="deleteConfirmNote = null"
+      @confirm="confirmDelete"
+    />
+
+    <!-- Toast Notification -->
+    <Toast
+      :message="toastStore.message"
+      :type="toastStore.type"
+      :visible="toastStore.visible"
+      @close="toastStore.hideToast()"
     />
   </div>
 </template>
@@ -167,17 +181,22 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useNotesStore } from '@/stores/notes'
+import { useToastStore } from '@/stores/toast'
 import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
 import NoteCard from './NoteCard.vue'
 import NoteModal from './NoteModal.vue'
 import NoteViewModal from './NoteViewModal.vue'
+import DeleteConfirmModal from './DeleteConfirmModal.vue'
+import Toast from './Toast.vue'
 
 const notesStore = useNotesStore()
+const toastStore = useToastStore()
 
 // Reactive state
 const showCreateForm = ref(false)
 const editingNote = ref<Note | null>(null)
 const viewingNote = ref<Note | null>(null)
+const deleteConfirmNote = ref<Note | null>(null)
 const searchQuery = ref('')
 const sortBy = ref<'title' | 'createdAt' | 'updatedAt'>('updatedAt')
 const isDescending = ref(true)
@@ -204,17 +223,23 @@ const editNote = (note: Note) => {
   viewingNote.value = null
 }
 
-const deleteNote = async (note: Note) => {
-  if (confirm(`Are you sure you want to delete "${note.title}"?`)) {
-    try {
-      await notesStore.deleteNote(note.id)
-      // Close view modal if we're viewing the deleted note
-      if (viewingNote.value?.id === note.id) {
-        viewingNote.value = null
-      }
-    } catch (error) {
-      console.error('Failed to delete note:', error)
+const deleteNote = (note: Note) => {
+  deleteConfirmNote.value = note
+}
+
+const confirmDelete = async () => {
+  if (!deleteConfirmNote.value) return
+  try {
+    await notesStore.deleteNote(deleteConfirmNote.value.id)
+    toastStore.showToast('Note deleted', 'success')
+    // Close view modal if we're viewing the deleted note
+    if (viewingNote.value?.id === deleteConfirmNote.value.id) {
+      viewingNote.value = null
     }
+  } catch (error) {
+    toastStore.showToast('Failed to delete note', 'error')
+  } finally {
+    deleteConfirmNote.value = null
   }
 }
 
@@ -222,12 +247,14 @@ const saveNote = async (noteData: CreateNoteRequest | UpdateNoteRequest) => {
   try {
     if (editingNote.value) {
       await notesStore.updateNote(editingNote.value.id, noteData as UpdateNoteRequest)
+      toastStore.showToast('Note updated', 'success')
     } else {
       await notesStore.createNote(noteData as CreateNoteRequest)
+      toastStore.showToast('Note created', 'success')
     }
     cancelEdit()
   } catch (error) {
-    console.error('Failed to save note:', error)
+    toastStore.showToast('Failed to save note', 'error')
   }
 }
 
@@ -245,9 +272,8 @@ const editFromView = (note: Note) => {
   editingNote.value = note
 }
 
-const deleteFromView = async (note: Note) => {
-  viewingNote.value = null
-  await deleteNote(note)
+const deleteFromView = (note: Note) => {
+  deleteNote(note)
 }
 
 // Load notes on component mount
