@@ -1,7 +1,13 @@
 <template>
-  <div class="h-screen w-screen bg-white flex overflow-hidden">
-    <!-- Left Sidebar - Notion Style -->
-    <div class="w-64 bg-gray-50 border-r border-gray-200 flex-shrink-0 flex flex-col h-full">
+  <div class="h-screen w-screen bg-white flex overflow-hidden relative">
+    <!-- Mobile Sidebar Overlay -->
+    <div v-if="sidebarOpen" class="fixed inset-0 z-40 bg-black/30 md:hidden" @click="sidebarOpen = false"></div>
+    <!-- Sidebar -->
+    <div :class="[
+      'fixed md:static z-50 top-0 left-0 h-full w-64 bg-gray-50 border-r border-gray-200 flex-shrink-0 flex flex-col transition-transform duration-300',
+      sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      'md:translate-x-0'
+    ]">
       <!-- Logo/Brand -->
       <div class="p-4 border-b border-gray-200 flex-shrink-0">
         <div class="flex items-center space-x-3">
@@ -61,37 +67,64 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col h-full overflow-hidden bg-white">
       <!-- Header -->
-      <header class="bg-white border-b border-gray-200 px-8 py-6 flex-shrink-0">
-        <div class="flex justify-between items-center">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">My Notes</h1>
-          </div>
-          <div class="flex items-center space-x-3">
-            <!-- Sort Controls -->
-            <select
-              v-model="sortBy"
-              class="px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-900"
-            >
-              <option value="updatedAt">Recently Updated</option>
-              <option value="createdAt">Recently Created</option>
-              <option value="title">Title A-Z</option>
-            </select>
-            <button
-              @click="isDescending = !isDescending"
-              class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700"
-              :title="isDescending ? 'Sort Ascending' : 'Sort Descending'"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path v-if="isDescending" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-            </button>
-          </div>
+      <header class="bg-white border-b border-gray-200 px-4 md:px-8 py-6 flex-shrink-0 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Hamburger for mobile -->
+          <button @click="sidebarOpen = true" class="md:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h1 class="text-3xl font-bold text-gray-900">My Notes</h1>
+        </div>
+        <div class="flex items-center space-x-3">
+          <!-- Sort Controls -->
+          <select
+            v-model="sortBy"
+            class="px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-900"
+          >
+            <option value="updatedAt">Recently Updated</option>
+            <option value="createdAt">Recently Created</option>
+            <option value="title">Title A-Z</option>
+          </select>
+          <button
+            @click="isDescending = !isDescending"
+            class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700"
+            :title="isDescending ? 'Sort Ascending' : 'Sort Descending'"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path v-if="isDescending" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </button>
         </div>
       </header>
 
       <!-- Content Area -->
       <div class="flex-1 overflow-y-auto px-8 py-6">
+        <!-- Mobile Search & Create Controls -->
+        <div class="md:hidden flex flex-col gap-3 mb-6">
+          <div class="relative">
+            <svg class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search notes..."
+              class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <button
+            @click="showCreateForm = true"
+            class="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 px-4 rounded-md transition-colors flex items-center justify-center space-x-2 text-sm"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span>New Note</span>
+          </button>
+        </div>
         <!-- Error Message -->
         <div v-if="notesStore.error" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex justify-between items-center">
           <span>{{ notesStore.error }}</span>
@@ -183,11 +216,11 @@ import { ref, onMounted, watch } from 'vue'
 import { useNotesStore } from '@/stores/notes'
 import { useToastStore } from '@/stores/toast'
 import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
-import NoteCard from './NoteCard.vue'
-import NoteModal from './NoteModal.vue'
-import NoteViewModal from './NoteViewModal.vue'
-import DeleteConfirmModal from './DeleteConfirmModal.vue'
-import Toast from './Toast.vue'
+import NoteCard from '../components/NoteCard.vue'
+import NoteModal from '../components/NoteModal.vue'
+import NoteViewModal from '../components/NoteViewModal.vue'
+import DeleteConfirmModal from '../components/DeleteConfirmModal.vue'
+import Toast from '../components/Toast.vue'
 
 const notesStore = useNotesStore()
 const toastStore = useToastStore()
@@ -200,6 +233,7 @@ const deleteConfirmNote = ref<Note | null>(null)
 const searchQuery = ref('')
 const sortBy = ref<'title' | 'createdAt' | 'updatedAt'>('updatedAt')
 const isDescending = ref(true)
+const sidebarOpen = ref(false)
 
 // Watch for changes and update store filters
 watch([searchQuery, sortBy, isDescending], () => {

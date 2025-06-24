@@ -5,10 +5,10 @@
     @click="handleOverlayClick"
   >
     <!-- Modal Container -->
-    <div class="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-xl overflow-hidden h-[80vh] flex flex-col">
+    <div class="fixed left-[50%] top-[50%] z-50 w-[95vw] max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-4xl translate-x-[-50%] translate-y-[-50%] bg-white rounded-xl md:rounded-2xl shadow-xl overflow-hidden h-[90vh] md:h-[80vh] flex flex-col">
       
       <!-- Header -->
-      <div class="border-b border-gray-200 p-6 flex-shrink-0 flex items-center justify-between">
+      <div class="border-b border-gray-200 p-4 sm:p-6 md:p-8 flex-shrink-0 flex items-center justify-between">
         <div>
           <h2 class="text-2xl font-bold text-gray-900">
             {{ isEditing ? 'Edit Note' : 'New Note' }}
@@ -28,7 +28,7 @@
       </div>
 
       <!-- Fixed Scrollable Content -->
-      <div class="flex-1 overflow-y-auto p-6">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10">
         <form @submit.prevent="handleSubmit" class="space-y-6 h-full flex flex-col">
           <!-- Title Field -->
           <div>
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Footer Actions -->
-      <div class="flex justify-end items-center p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+      <div class="flex justify-end items-center p-4 sm:p-6 md:p-8 border-t border-gray-200 bg-gray-50 flex-shrink-0">
         <div class="flex space-x-3">
           <button
             type="button"

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import NotesApp from './components/NotesApp.vue'
+import NotesApp from './pages/NotesApp.vue'
 </script>
 
 <style>

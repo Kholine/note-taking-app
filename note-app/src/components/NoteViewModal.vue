@@ -5,41 +5,47 @@
     @click="handleOverlayClick"
   >
     <!-- Modal Container -->
-    <div class="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-xl overflow-hidden h-[80vh] flex flex-col">
+    <div class="fixed left-[50%] top-[50%] z-50 w-[95vw] max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-4xl translate-x-[-50%] translate-y-[-50%] bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-xl md:rounded-2xl shadow-2xl overflow-hidden h-[90vh] md:h-[80vh] flex flex-col animate-fade-in-premium">
       
       <!-- Header -->
-      <div class="border-b border-gray-200 p-6 flex-shrink-0">
+      <div class="border-b border-gray-200 p-4 sm:p-6 md:p-8 flex-shrink-0">
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1 min-w-0">
-            <h1 class="text-2xl font-bold text-gray-900 break-words leading-tight mb-3">
+            <h1 class="text-3xl font-extrabold text-gray-900 break-words leading-tight mb-2 tracking-tight">
               {{ note.title }}
             </h1>
-            
-            <!-- Metadata -->
-            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              <span>Created {{ formatDateShort(note.createdAt) }}</span>
-              <span v-if="note.updatedAt !== note.createdAt">
-                Updated {{ formatDateShort(note.updatedAt) }}
-              </span>
+            <!-- Metadata Bar -->
+            <div class="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-gray-500 bg-gray-50 rounded-lg px-4 py-2 mt-2 mb-1 shadow-sm w-full">
+              <div class="flex items-center gap-1 mb-1">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Created {{ formatDateShort(note.createdAt) }}</span>
+              </div>
+              <div v-if="note.updatedAt !== note.createdAt" class="flex items-center gap-1 mb-1">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
+                <span>Updated {{ formatDateShort(note.updatedAt) }}</span>
+              </div>
             </div>
           </div>
-          
           <button
             @click="$emit('close')"
-            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex-shrink-0"
+            class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+            title="Close"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
 
+      <!-- Divider -->
+      <div class="border-b border-gray-100"></div>
+
       <!-- Fixed Scrollable Content -->
-      <div class="flex-1 overflow-y-auto p-6">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 bg-white/80">
         <!-- Content Display -->
-        <div v-if="note.content" class="prose prose-gray max-w-none">
-          <div class="text-gray-900 leading-relaxed whitespace-pre-wrap text-base">
+        <div v-if="note.content" class="prose prose-lg prose-gray max-w-none">
+          <div class="text-gray-900 leading-relaxed whitespace-pre-wrap text-lg" style="line-height:1.85;">
             {{ note.content }}
           </div>
         </div>
@@ -61,36 +67,31 @@
       </div>
 
       <!-- Footer Actions -->
-      <div class="flex justify-end items-center p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-        
-        <div class="flex space-x-3">
-          <button
-            @click="$emit('close')"
-            class="px-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Close
-          </button>
-          
-          <button
-            @click="$emit('edit', note)"
-            class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center space-x-2"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            <span>Edit</span>
-          </button>
-          
-          <button
-            @click="handleDelete"
-            class="px-4 py-2 text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors flex items-center space-x-2"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <span>Delete</span>
-          </button>
-        </div>
+      <div class="flex justify-end items-center p-4 sm:p-6 md:p-8 border-t border-gray-100 bg-white/90 flex-shrink-0 gap-3">
+        <button
+          @click="$emit('close')"
+          class="px-5 py-2 text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors shadow-sm"
+        >
+          Close
+        </button>
+        <button
+          @click="$emit('edit', note)"
+          class="px-5 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors flex items-center space-x-2 shadow-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span>Edit</span>
+        </button>
+        <button
+          @click="handleDelete"
+          class="px-5 py-2 text-red-600 bg-red-50 border border-red-200 rounded-full hover:bg-red-100 transition-colors flex items-center space-x-2 shadow-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span>Delete</span>
+        </button>
       </div>
     </div>
   </div>
