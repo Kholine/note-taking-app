@@ -1,0 +1,19 @@
+{
+  "Version": 1,
+  "Hash": "LK3dZdfv6mLSd1HOaVa9kiUzVeKX8xYLsHaPE44Tm8w=",
+  "Source": "Web_Project",
+  "BasePath": "_content/Web_Project",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Web_Project/wwwroot",
+      "Source": "Web_Project",
+      "ContentRoot": "/Users/kholine/Project Source Code/Dotnet/Web_Project/Web_Project/wwwroot/",
+      "BasePath": "_content/Web_Project",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}
