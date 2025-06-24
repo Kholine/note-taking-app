@@ -1,17 +1,17 @@
 {
   "Version": 1,
-  "Hash": "LK3dZdfv6mLSd1HOaVa9kiUzVeKX8xYLsHaPE44Tm8w=",
-  "Source": "Web_Project",
-  "BasePath": "_content/Web_Project",
+  "Hash": "fvRi08cE5iCg5ImoIcEwnkdMulf3Uc4SArQ7cPVyb7U=",
+  "Source": "backend",
+  "BasePath": "_content/backend",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [
     {
-      "Name": "Web_Project/wwwroot",
-      "Source": "Web_Project",
-      "ContentRoot": "/Users/kholine/Project Source Code/Dotnet/Web_Project/Web_Project/wwwroot/",
-      "BasePath": "_content/Web_Project",
+      "Name": "backend/wwwroot",
+      "Source": "backend",
+      "ContentRoot": "/Users/kholine/Project Source Code/Dotnet/Web_Project/backend/wwwroot/",
+      "BasePath": "_content/backend",
       "Pattern": "**"
     }
   ],

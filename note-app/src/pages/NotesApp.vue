@@ -9,7 +9,7 @@
       'md:translate-x-0'
     ]">
       <!-- Logo/Brand -->
-      <div class="p-4 border-b border-gray-200 flex-shrink-0">
+      <div class="py-5 px-4 flex-shrink-0">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-gray-900 rounded-md flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,11 +77,11 @@
           </button>
           <h1 class="text-3xl font-bold text-gray-900">My Notes</h1>
         </div>
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 flex-wrap">
           <!-- Sort Controls -->
           <select
             v-model="sortBy"
-            class="px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-900"
+            class="min-w-[160px] px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-900"
           >
             <option value="updatedAt">Recently Updated</option>
             <option value="createdAt">Recently Created</option>
@@ -177,21 +177,13 @@
       </div>
     </div>
 
-    <!-- Create/Edit Modal -->
+    <!-- Create/Edit/View Modal -->
     <NoteModal
-      v-if="showCreateForm || editingNote"
-      :note="editingNote"
+      v-if="showCreateForm || editingNote || viewingNote"
+      :note="editingNote || viewingNote"
       @save="saveNote"
-      @cancel="cancelEdit"
-    />
-
-    <!-- View Modal -->
-    <NoteViewModal
-      v-if="viewingNote"
-      :note="viewingNote"
-      @close="closeView"
-      @edit="editFromView"
-      @request-delete="deleteFromView"
+      @cancel="cancelEditOrView"
+      @delete="deleteFromModal"
     />
 
     <!-- Delete Confirmation Modal -->
@@ -218,7 +210,6 @@ import { useToastStore } from '@/stores/toast'
 import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
 import NoteCard from '../components/NoteCard.vue'
 import NoteModal from '../components/NoteModal.vue'
-import NoteViewModal from '../components/NoteViewModal.vue'
 import DeleteConfirmModal from '../components/DeleteConfirmModal.vue'
 import Toast from '../components/Toast.vue'
 
@@ -286,27 +277,19 @@ const saveNote = async (noteData: CreateNoteRequest | UpdateNoteRequest) => {
       await notesStore.createNote(noteData as CreateNoteRequest)
       toastStore.showToast('Note created', 'success')
     }
-    cancelEdit()
+    cancelEditOrView()
   } catch (error) {
     toastStore.showToast('Failed to save note', 'error')
   }
 }
 
-const cancelEdit = () => {
+const cancelEditOrView = () => {
   showCreateForm.value = false
   editingNote.value = null
-}
-
-const closeView = () => {
   viewingNote.value = null
 }
 
-const editFromView = (note: Note) => {
-  viewingNote.value = null
-  editingNote.value = note
-}
-
-const deleteFromView = (note: Note) => {
+const deleteFromModal = (note: Note) => {
   deleteNote(note)
 }
 

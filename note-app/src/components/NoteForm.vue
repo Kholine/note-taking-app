@@ -12,7 +12,7 @@
         type="text"
         required
         placeholder="Note title..."
-        class="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+        class="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
       />
       <div v-if="titleError" class="text-sm text-red-600 mt-1">
         {{ titleError }}
@@ -27,7 +27,7 @@
         id="content"
         v-model="formData.content"
         placeholder="Start writing..."
-        class="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500 min-h-[200px] flex-1"
+        class="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500 min-h-[200px] flex-1"
         rows="12"
       />
     </div>
