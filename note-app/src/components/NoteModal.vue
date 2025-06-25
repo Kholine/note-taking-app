@@ -4,7 +4,6 @@
     class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center"
     @click="handleOverlayClick"
   >
-    <!-- Notion-style Modal Container -->
     <div
       class="relative w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col min-h-[60vh] max-h-[90vh] animate-fade-in-premium"
       @click.stop

@@ -82,7 +82,6 @@ defineEmits<{
   delete: [note: Note]
 }>()
 
-// Notion-inspired color palette - more subtle
 const cardColors = [
   'bg-blue-500',
   'bg-purple-500', 
