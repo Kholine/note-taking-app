@@ -1,3 +1,53 @@
+<script setup lang="ts">
+  import type { Note } from '@/types'
+  
+  const props = defineProps<{
+    note: Note
+    colorIndex: number
+  }>()
+  
+  defineEmits<{
+    view: [note: Note]
+    edit: [note: Note]
+    delete: [note: Note]
+  }>()
+  
+  const cardColors = [
+    'bg-blue-500',
+    'bg-purple-500', 
+    'bg-green-500',
+    'bg-orange-500',
+    'bg-red-500',
+    'bg-teal-500',
+    'bg-indigo-500',
+    'bg-pink-500',
+    'bg-yellow-500',
+    'bg-gray-500'
+  ]
+  
+  const formatDateShort = (dateString: string): string => {
+    // Parse as UTC and convert to local
+    const date = new Date(dateString + 'Z');
+    const now = new Date();
+    const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 1) {
+      return 'Just now';
+    } else if (diffInHours < 24) {
+      return `${Math.floor(diffInHours)}h ago`;
+    } else if (diffInHours < 24 * 7) {
+      const days = Math.floor(diffInHours / 24);
+      return `${days}d ago`;
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+  }
+</script>
+
 <template>
   <div 
     @click="$emit('view', note)"
@@ -67,56 +117,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Note } from '@/types'
-
-const props = defineProps<{
-  note: Note
-  colorIndex: number
-}>()
-
-defineEmits<{
-  view: [note: Note]
-  edit: [note: Note]
-  delete: [note: Note]
-}>()
-
-const cardColors = [
-  'bg-blue-500',
-  'bg-purple-500', 
-  'bg-green-500',
-  'bg-orange-500',
-  'bg-red-500',
-  'bg-teal-500',
-  'bg-indigo-500',
-  'bg-pink-500',
-  'bg-yellow-500',
-  'bg-gray-500'
-]
-
-const formatDateShort = (dateString: string): string => {
-  // Parse as UTC and convert to local
-  const date = new Date(dateString + 'Z');
-  const now = new Date();
-  const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
-  
-  if (diffInHours < 1) {
-    return 'Just now';
-  } else if (diffInHours < 24) {
-    return `${Math.floor(diffInHours)}h ago`;
-  } else if (diffInHours < 24 * 7) {
-    const days = Math.floor(diffInHours / 24);
-    return `${days}d ago`;
-  } else {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-  }
-}
-</script>
 
 <style scoped>
 /* Line clamp utilities */

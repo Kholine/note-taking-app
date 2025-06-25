@@ -1,12 +1,12 @@
+<script setup lang="ts">
+  import NotesApp from './pages/NotesApp.vue'
+</script>
+
 <template>
   <div id="app" class="h-screen w-screen overflow-hidden bg-gray-50">
     <NotesApp />
   </div>
 </template>
-
-<script setup lang="ts">
-import NotesApp from './pages/NotesApp.vue'
-</script>
 
 <style>
 /* Global reset for full-screen */

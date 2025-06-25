@@ -1,3 +1,14 @@
+<script setup lang="ts">
+  import { computed } from 'vue'
+  const props = defineProps<{ message: string, type?: 'success' | 'error' | 'info', visible: boolean }>()
+  const emit = defineEmits(['close'])
+  const toastClass = computed(() => {
+    if (props.type === 'success') return 'bg-green-50 border border-green-200'
+    if (props.type === 'error') return 'bg-red-50 border border-red-200'
+    return 'bg-white border border-gray-200'
+  })
+</script>
+
 <template>
   <transition name="toast-fade">
     <div v-if="visible" :class="toastClass" class="fixed bottom-6 right-6 z-50 min-w-[240px] max-w-xs px-4 py-3 rounded-lg shadow-lg flex items-start space-x-3 animate-fade-in">
@@ -19,17 +30,6 @@
     </div>
   </transition>
 </template>
-
-<script setup lang="ts">
-import { computed } from 'vue'
-const props = defineProps<{ message: string, type?: 'success' | 'error' | 'info', visible: boolean }>()
-const emit = defineEmits(['close'])
-const toastClass = computed(() => {
-  if (props.type === 'success') return 'bg-green-50 border border-green-200'
-  if (props.type === 'error') return 'bg-red-50 border border-red-200'
-  return 'bg-white border border-gray-200'
-})
-</script>
 
 <style scoped>
 .toast-fade-enter-active, .toast-fade-leave-active {

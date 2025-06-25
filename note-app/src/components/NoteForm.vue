@@ -1,3 +1,22 @@
+<script setup lang="ts">
+  import { ref, onMounted, nextTick } from 'vue'
+  const props = defineProps<{
+    formData: { title: string; content: string }
+    titleError: string
+    isEditing: boolean
+  }>()
+  const emit = defineEmits(['save', 'cancel'])
+  const titleInput = ref<HTMLInputElement>()
+  const handleSubmit = () => {
+    emit('save')
+  }
+  onMounted(() => {
+    nextTick(() => {
+      titleInput.value?.focus()
+    })
+  })
+</script> 
+
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-6 h-full flex flex-col">
     <!-- Title Field -->
@@ -34,21 +53,3 @@
     <slot name="footer" />
   </form>
 </template>
-<script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
-const props = defineProps<{
-  formData: { title: string; content: string }
-  titleError: string
-  isEditing: boolean
-}>()
-const emit = defineEmits(['save', 'cancel'])
-const titleInput = ref<HTMLInputElement>()
-const handleSubmit = () => {
-  emit('save')
-}
-onMounted(() => {
-  nextTick(() => {
-    titleInput.value?.focus()
-  })
-})
-</script> 

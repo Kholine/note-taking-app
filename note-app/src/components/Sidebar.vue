@@ -1,3 +1,13 @@
+<script setup lang="ts">
+  import { computed } from 'vue'
+  const props = defineProps<{ searchQuery: string, notesCount: number }>()
+  const emit = defineEmits(['update:searchQuery', 'create'])
+  const searchQueryProxy = computed({
+    get: () => props.searchQuery,
+    set: (val: string) => emit('update:searchQuery', val)
+  })
+</script> 
+
 <template>
   <div class="w-64 bg-gray-50 border-r border-gray-200 flex-shrink-0 flex flex-col h-full">
     <!-- Logo/Brand -->
@@ -53,12 +63,3 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import { computed } from 'vue'
-const props = defineProps<{ searchQuery: string, notesCount: number }>()
-const emit = defineEmits(['update:searchQuery', 'create'])
-const searchQueryProxy = computed({
-  get: () => props.searchQuery,
-  set: (val: string) => emit('update:searchQuery', val)
-})
-</script> 

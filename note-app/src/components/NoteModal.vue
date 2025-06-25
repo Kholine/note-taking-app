@@ -1,3 +1,106 @@
+<script setup lang="ts">
+  import { ref, computed, onMounted, nextTick, watch } from 'vue'
+  import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
+  
+  const props = defineProps<{
+    note?: Note | null
+  }>()
+  
+  const emit = defineEmits<{
+    save: [noteData: CreateNoteRequest | UpdateNoteRequest]
+    cancel: []
+    delete: [note: Note]
+  }>()
+  
+  const mode = ref<'view' | 'edit'>(props.note ? 'view' : 'edit')
+  
+  const titleInput = ref<HTMLInputElement>()
+  
+  const formData = ref({
+    title: '',
+    content: ''
+  })
+  
+  const titleError = ref('')
+  
+  const isEditing = computed(() => !!props.note)
+  
+  const isFormValid = computed(() => {
+    return formData.value.title.trim().length > 0 && !titleError.value
+  })
+  
+  // Validation
+  watch(() => formData.value.title, (newTitle) => {
+    if (newTitle.trim().length === 0) {
+      titleError.value = 'Title is required'
+    } else if (newTitle.trim().length > 100) {
+      titleError.value = 'Title must be less than 100 characters'
+    } else {
+      titleError.value = ''
+    }
+  })
+  
+  const handleSubmit = () => {
+    if (!isFormValid.value) return
+    emit('save', {
+      title: formData.value.title.trim(),
+      content: formData.value.content.trim()
+    })
+  }
+  
+  const handleOverlayClick = (event: MouseEvent) => {
+    if (event.target === event.currentTarget) {
+      handleCancel()
+    }
+  }
+  
+  const handleCancel = () => {
+    emit('cancel')
+  }
+  
+  const handleDelete = () => {
+    if (props.note) emit('delete', props.note)
+  }
+  
+  const switchToEdit = () => {
+    mode.value = 'edit'
+    nextTick(() => {
+      titleInput.value?.focus()
+    })
+  }
+  
+  const formatDateShort = (dateString?: string): string => {
+    if (!dateString) return ''
+    const date = new Date(dateString + 'Z');
+    const now = new Date();
+    const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    if (diffInHours < 1) {
+      return 'just now';
+    } else if (diffInHours < 24) {
+      return `${Math.floor(diffInHours)}h ago`;
+    } else if (diffInHours < 24 * 7) {
+      const days = Math.floor(diffInHours / 24);
+      return `${days}d ago`;
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+  }
+  
+  // Initialize form data when editing
+  onMounted(() => {
+    if (props.note) {
+      formData.value = {
+        title: props.note.title,
+        content: props.note.content
+      }
+    }
+  })
+</script>
+
 <template>
   <!-- Modal Overlay -->
   <div 
@@ -144,109 +247,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
-import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
-
-const props = defineProps<{
-  note?: Note | null
-}>()
-
-const emit = defineEmits<{
-  save: [noteData: CreateNoteRequest | UpdateNoteRequest]
-  cancel: []
-  delete: [note: Note]
-}>()
-
-const mode = ref<'view' | 'edit'>(props.note ? 'view' : 'edit')
-
-const titleInput = ref<HTMLInputElement>()
-
-const formData = ref({
-  title: '',
-  content: ''
-})
-
-const titleError = ref('')
-
-const isEditing = computed(() => !!props.note)
-
-const isFormValid = computed(() => {
-  return formData.value.title.trim().length > 0 && !titleError.value
-})
-
-// Validation
-watch(() => formData.value.title, (newTitle) => {
-  if (newTitle.trim().length === 0) {
-    titleError.value = 'Title is required'
-  } else if (newTitle.trim().length > 100) {
-    titleError.value = 'Title must be less than 100 characters'
-  } else {
-    titleError.value = ''
-  }
-})
-
-const handleSubmit = () => {
-  if (!isFormValid.value) return
-  emit('save', {
-    title: formData.value.title.trim(),
-    content: formData.value.content.trim()
-  })
-}
-
-const handleOverlayClick = (event: MouseEvent) => {
-  if (event.target === event.currentTarget) {
-    handleCancel()
-  }
-}
-
-const handleCancel = () => {
-  emit('cancel')
-}
-
-const handleDelete = () => {
-  if (props.note) emit('delete', props.note)
-}
-
-const switchToEdit = () => {
-  mode.value = 'edit'
-  nextTick(() => {
-    titleInput.value?.focus()
-  })
-}
-
-const formatDateShort = (dateString?: string): string => {
-  if (!dateString) return ''
-  const date = new Date(dateString + 'Z');
-  const now = new Date();
-  const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
-  if (diffInHours < 1) {
-    return 'just now';
-  } else if (diffInHours < 24) {
-    return `${Math.floor(diffInHours)}h ago`;
-  } else if (diffInHours < 24 * 7) {
-    const days = Math.floor(diffInHours / 24);
-    return `${days}d ago`;
-  } else {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-  }
-}
-
-// Initialize form data when editing
-onMounted(() => {
-  if (props.note) {
-    formData.value = {
-      title: props.note.title,
-      content: props.note.content
-    }
-  }
-})
-</script>
 
 <style scoped>
 /* Custom scrollbar for modal content */

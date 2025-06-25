@@ -1,3 +1,7 @@
+<script setup lang="ts">
+  defineEmits(['cancel', 'confirm'])
+</script>   
+
 <template>
   <div class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
@@ -11,6 +15,3 @@
   </div>
 </template>
 
-<script setup lang="ts">
-defineEmits(['cancel', 'confirm'])
-</script> 

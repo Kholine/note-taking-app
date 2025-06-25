@@ -1,3 +1,13 @@
+<script setup lang="ts">
+  import { computed } from 'vue'
+  const props = defineProps<{ title: string, sortBy: string, isDescending: boolean, showHamburger?: boolean }>()
+  const emit = defineEmits(['update:sortBy', 'toggleSortDirection', 'toggleSidebar'])
+  const sortByProxy = computed({
+    get: () => props.sortBy,
+    set: (val: string) => emit('update:sortBy', val)
+  })
+</script> 
+
 <template>
   <header class="bg-white border-b border-gray-200 px-4 md:px-8 py-6 flex-shrink-0 flex items-center justify-between">
     <div class="flex items-center gap-3">
@@ -30,12 +40,3 @@
     </div>
   </header>
 </template>
-<script setup lang="ts">
-import { computed } from 'vue'
-const props = defineProps<{ title: string, sortBy: string, isDescending: boolean, showHamburger?: boolean }>()
-const emit = defineEmits(['update:sortBy', 'toggleSortDirection', 'toggleSidebar'])
-const sortByProxy = computed({
-  get: () => props.sortBy,
-  set: (val: string) => emit('update:sortBy', val)
-})
-</script> 

@@ -1,3 +1,99 @@
+<script setup lang="ts">
+  import { ref, onMounted, watch } from 'vue'
+  import { useNotesStore } from '@/stores/notes'
+  import { useToastStore } from '@/stores/toast'
+  import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
+  import NoteCard from '../components/NoteCard.vue'
+  import NoteModal from '../components/NoteModal.vue'
+  import DeleteConfirmModal from '../components/DeleteConfirmModal.vue'
+  import Toast from '../components/Toast.vue'
+  
+  const notesStore = useNotesStore()
+  const toastStore = useToastStore()
+  
+  // Reactive state
+  const showCreateForm = ref(false)
+  const editingNote = ref<Note | null>(null)
+  const viewingNote = ref<Note | null>(null)
+  const deleteConfirmNote = ref<Note | null>(null)
+  const searchQuery = ref('')
+  const sortBy = ref<'title' | 'createdAt' | 'updatedAt'>('updatedAt')
+  const isDescending = ref(true)
+  const sidebarOpen = ref(false)
+  
+  // Watch for changes and update store filters
+  watch([searchQuery, sortBy, isDescending], () => {
+    notesStore.setFilters({
+      search: searchQuery.value,
+      sortBy: sortBy.value,
+      isDescending: isDescending.value
+    })
+  }, { immediate: true })
+  
+  // Methods
+  const viewNote = (note: Note) => {
+    viewingNote.value = note
+    showCreateForm.value = false
+    editingNote.value = null
+  }
+  
+  const editNote = (note: Note) => {
+    editingNote.value = note
+    showCreateForm.value = false
+    viewingNote.value = null
+  }
+  
+  const deleteNote = (note: Note) => {
+    deleteConfirmNote.value = note
+  }
+  
+  const confirmDelete = async () => {
+    if (!deleteConfirmNote.value) return
+    try {
+      await notesStore.deleteNote(deleteConfirmNote.value.id)
+      toastStore.showToast('Note deleted', 'success')
+      // Close view modal if we're viewing the deleted note
+      if (viewingNote.value?.id === deleteConfirmNote.value.id) {
+        viewingNote.value = null
+      }
+    } catch (error) {
+      toastStore.showToast('Failed to delete note', 'error')
+    } finally {
+      deleteConfirmNote.value = null
+    }
+  }
+  
+  const saveNote = async (noteData: CreateNoteRequest | UpdateNoteRequest) => {
+    try {
+      if (editingNote.value) {
+        await notesStore.updateNote(editingNote.value.id, noteData as UpdateNoteRequest)
+        toastStore.showToast('Note updated', 'success')
+      } else {
+        await notesStore.createNote(noteData as CreateNoteRequest)
+        toastStore.showToast('Note created', 'success')
+      }
+      cancelEditOrView()
+    } catch (error) {
+      toastStore.showToast('Failed to save note', 'error')
+    }
+  }
+  
+  const cancelEditOrView = () => {
+    showCreateForm.value = false
+    editingNote.value = null
+    viewingNote.value = null
+  }
+  
+  const deleteFromModal = (note: Note) => {
+    deleteNote(note)
+  }
+  
+  // Load notes on component mount
+  onMounted(() => {
+    notesStore.fetchNotes()
+  })
+</script>
+
 <template>
   <div class="h-screen w-screen bg-white flex overflow-hidden relative">
     <!-- Mobile Sidebar Overlay -->
@@ -203,101 +299,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useNotesStore } from '@/stores/notes'
-import { useToastStore } from '@/stores/toast'
-import type { Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
-import NoteCard from '../components/NoteCard.vue'
-import NoteModal from '../components/NoteModal.vue'
-import DeleteConfirmModal from '../components/DeleteConfirmModal.vue'
-import Toast from '../components/Toast.vue'
 
-const notesStore = useNotesStore()
-const toastStore = useToastStore()
-
-// Reactive state
-const showCreateForm = ref(false)
-const editingNote = ref<Note | null>(null)
-const viewingNote = ref<Note | null>(null)
-const deleteConfirmNote = ref<Note | null>(null)
-const searchQuery = ref('')
-const sortBy = ref<'title' | 'createdAt' | 'updatedAt'>('updatedAt')
-const isDescending = ref(true)
-const sidebarOpen = ref(false)
-
-// Watch for changes and update store filters
-watch([searchQuery, sortBy, isDescending], () => {
-  notesStore.setFilters({
-    search: searchQuery.value,
-    sortBy: sortBy.value,
-    isDescending: isDescending.value
-  })
-}, { immediate: true })
-
-// Methods
-const viewNote = (note: Note) => {
-  viewingNote.value = note
-  showCreateForm.value = false
-  editingNote.value = null
-}
-
-const editNote = (note: Note) => {
-  editingNote.value = note
-  showCreateForm.value = false
-  viewingNote.value = null
-}
-
-const deleteNote = (note: Note) => {
-  deleteConfirmNote.value = note
-}
-
-const confirmDelete = async () => {
-  if (!deleteConfirmNote.value) return
-  try {
-    await notesStore.deleteNote(deleteConfirmNote.value.id)
-    toastStore.showToast('Note deleted', 'success')
-    // Close view modal if we're viewing the deleted note
-    if (viewingNote.value?.id === deleteConfirmNote.value.id) {
-      viewingNote.value = null
-    }
-  } catch (error) {
-    toastStore.showToast('Failed to delete note', 'error')
-  } finally {
-    deleteConfirmNote.value = null
-  }
-}
-
-const saveNote = async (noteData: CreateNoteRequest | UpdateNoteRequest) => {
-  try {
-    if (editingNote.value) {
-      await notesStore.updateNote(editingNote.value.id, noteData as UpdateNoteRequest)
-      toastStore.showToast('Note updated', 'success')
-    } else {
-      await notesStore.createNote(noteData as CreateNoteRequest)
-      toastStore.showToast('Note created', 'success')
-    }
-    cancelEditOrView()
-  } catch (error) {
-    toastStore.showToast('Failed to save note', 'error')
-  }
-}
-
-const cancelEditOrView = () => {
-  showCreateForm.value = false
-  editingNote.value = null
-  viewingNote.value = null
-}
-
-const deleteFromModal = (note: Note) => {
-  deleteNote(note)
-}
-
-// Load notes on component mount
-onMounted(() => {
-  notesStore.fetchNotes()
-})
-</script>
 
 <style scoped>
 /* Custom scrollbar for clean look */
