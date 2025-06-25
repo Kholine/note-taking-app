@@ -4,15 +4,17 @@
   
   const props = defineProps<{
     note?: Note | null
+    isEditing?: boolean
   }>()
   
   const emit = defineEmits<{
     save: [noteData: CreateNoteRequest | UpdateNoteRequest]
     cancel: []
     delete: [note: Note]
+    switchToEdit: []
   }>()
   
-  const mode = ref<'view' | 'edit'>(props.note ? 'view' : 'edit')
+  const mode = ref<'view' | 'edit'>(props.isEditing ? 'edit' : (props.note ? 'view' : 'edit'))
   
   const titleInput = ref<HTMLInputElement>()
   
@@ -23,7 +25,7 @@
   
   const titleError = ref('')
   
-  const isEditing = computed(() => !!props.note)
+  const isEditing = computed(() => props.isEditing || false)
   
   const isFormValid = computed(() => {
     return formData.value.title.trim().length > 0 && !titleError.value
@@ -63,6 +65,7 @@
   }
   
   const switchToEdit = () => {
+    emit('switchToEdit')
     mode.value = 'edit'
     nextTick(() => {
       titleInput.value?.focus()

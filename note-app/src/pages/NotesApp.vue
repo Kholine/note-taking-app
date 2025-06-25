@@ -42,6 +42,13 @@
     showCreateForm.value = false
     viewingNote.value = null
   }
+
+  const switchToEdit = () => {
+    if (viewingNote.value) {
+      editingNote.value = viewingNote.value
+      viewingNote.value = null
+    }
+  }
   
   const deleteNote = (note: Note) => {
     deleteConfirmNote.value = note
@@ -277,9 +284,11 @@
     <NoteModal
       v-if="showCreateForm || editingNote || viewingNote"
       :note="editingNote || viewingNote"
+      :is-editing="!!editingNote"
       @save="saveNote"
       @cancel="cancelEditOrView"
       @delete="deleteFromModal"
+      @switch-to-edit="switchToEdit"
     />
 
     <!-- Delete Confirmation Modal -->
